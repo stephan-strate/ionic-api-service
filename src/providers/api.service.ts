@@ -364,7 +364,7 @@ export class ApiProvider {
 		
 						if (number < (this.repeat - 1)) {
 							setTimeout(() => {
-								this.request(url, (number + 1)).then(result => {
+								this.request(url, lifetime, (number + 1)).then(result => {
 									// request was successful after another try
 									this.cacheItems(result, url);
 									resolve(result);
