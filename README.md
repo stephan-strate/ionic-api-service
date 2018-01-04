@@ -31,5 +31,5 @@ export class Example {
 
 ## Methods
 | Method | Parameters | Description |
-| --- | --- | --- |
-| `get` | { array | object } endpoints to request, { array | string } parameters (optional) | Synchronously request one or multiple endpoints at once. You can extend the request with a string. |
+| :---: | :---: | :--- |
+| `get` | { array or object } endpoints to request, { array or string } parameters (optional) | Synchronously request one or multiple endpoints at once. You can extend the request with a string. |
