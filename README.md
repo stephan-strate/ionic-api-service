@@ -31,5 +31,7 @@ export class Example {
 
 ## Methods
 | Method | Parameters | Description |
-| :---: | :---: | :--- |
-| `get` | { array or object } endpoints to request, { array or string } parameters (optional) | Synchronously request one or multiple endpoints at once. You can extend the request with a string. |
+| :---: | :--- | :--- |
+| `get` | *{ array or object }* endpoint(s) to request, *{ array or string }* parameter(s) (optional) | Synchronously request one or multiple endpoints at once. You can extend the request with a string. |
+| `enableCache` | - | Enable the cache of your api requests. Requests that are in lifetime of your endpoint, wont be loaded again (default). |
+| `disableCache` | - | Disables the cache. All requests will be fetched from your remote api. |
