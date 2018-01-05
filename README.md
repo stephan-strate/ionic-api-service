@@ -4,7 +4,7 @@ When I was first using Ionic, I spent a lot of time and nerves figuring out how 
 
 For simple as well as complex applications you can use this provider.
 
-## Usage
+## Example
 
 ```typescript
 import { ApiProvider } from "../providers/api.service";
@@ -29,9 +29,40 @@ export class Example {
 }
 ```
 
-## Methods
+## Documentation
+
+### Methods
+
 | Method | Parameters | Description |
-| :---: | :--- | :--- |
-| `get` | *{ array or object }* endpoint(s) to request, *{ array or string }* parameter(s) (optional) | Synchronously request one or multiple endpoints at once. You can extend the request with a string. |
-| `enableCache` | - | Enable the cache of your api requests. Requests that are in lifetime of your endpoint, wont be loaded again (default). |
-| `disableCache` | - | Disables the cache. All requests will be fetched from your remote api. |
+| :--- | :--- | :--- |
+| `get(endpoint, params)` | `endpoint`, `params` | Synchronously request one or multiple endpoints at once. You can extend the request with a string. |
+| `enableCache()`, `disableCache()` | - | Enables/disables the cache of your api requests. Lifetime defines how long data will be fetched from cache. _(default: enabled)_ |
+| `enableDebug()`, `disableDebug()` | - | Enables `console.log()` statements, that helps to debug your application. _(default: disabled)_ |
+
+### Usage
+
+#### Asynchronous Requests
+
+```typescript
+// start multiple api requests
+this.api.get(ENDPOINTS.POSTS).then(response => {
+    // access data
+    console.log(response[ENDPOINTS.POSTS.endpoint]);
+});
+
+this.api.get(ENDPOINTS.USERS).then(response => {
+    // access data
+    console.log(response[ENDPOINTS.USERS.endpoint]);
+});
+```
+
+#### Synchronous Requests
+
+```typescript
+// start one request with multiple endpoints
+this.api.get([ENDPOINTS.POSTS, ENDPOINTS.USERS]).then(response => {
+    // access data
+    console.log(response[ENDPOINTS.POSTS.endpoint]);
+    console.log(response[ENDPOINTS.USERS.endpoint]);
+});
+```
