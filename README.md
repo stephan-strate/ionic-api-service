@@ -41,7 +41,19 @@ export class Example {
 
 ### Usage
 
+#### Handle Errors
+You will be thrown into the `catch` block, when the error message dismissed.
+
+```typescript
+this.api.get(ENDPOINTS.POSTS).then(response => {
+    // use data
+}).catch(error => {
+    // handle reject
+});
+```
+
 #### Asynchronous Requests
+Requests that do not need each other can be fetched asynchronously.
 
 ```typescript
 // start multiple api requests
@@ -57,6 +69,7 @@ this.api.get(ENDPOINTS.USERS).then(response => {
 ```
 
 #### Synchronous Requests
+When you need both requests at the same time, you can use the synchronous fetched requests. Note: When one request fails, no data will be returned and you will be thrown into the `catch` block.
 
 ```typescript
 // start one request with multiple endpoints
