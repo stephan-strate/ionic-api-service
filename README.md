@@ -31,6 +31,47 @@ export class Example {
 
 ## Documentation
 
+### Configuration
+You can define a base url and an api key, that will be used for all requests, or you define your endpoints with the whole domain.
+
+`url`, `endpoint`, `api key` and `params` will be concatenated like so, to see which url is requested, you can enable debug mode by using `enableDebug()`.
+````typescript
+const request_url = url + endpoint + api_key + params;
+````
+
+#### With Base Url and Api key
+
+```typescript
+export const API_CONFIG = {
+    url: "[BASE URL]",
+    api_key: "[API KEY]"
+};
+```
+
+`lifetime` describes the cache time in hours. Use `0` or disable cache to do not use cache.
+
+```typescript
+export const API = {
+    POSTS: { endpoint: "/posts", lifetime: 1 }
+};
+```
+
+#### Without Base Url and Api key
+When you want to use multiple api's, you can put the whole domain including the endpoint, into the endpoint.
+
+```typescript
+export const API_CONFIG = {
+    url: "",
+    api_key: ""
+};
+```
+
+```typescript
+export const API = {
+    POSTS: { endpoint: "[URL and ENDPOINT]", lifetime: 1 }
+};
+```
+
 ### Methods
 
 | Method | Parameters | Description |
