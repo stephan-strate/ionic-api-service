@@ -7,11 +7,11 @@ For simple as well as complex applications you can use this provider.
 ## Example
 
 ```typescript
-import { ApiProvider } from "../providers/api.service";
+import { ApiProvider, ApiEndpoint } from "../providers/api.service";
     
-export const ENDPOINTS = {
-    POSTS: { endpoint: "/posts", lifetime: 24 },
-    USERS: { endpoint: "/users", lifetime: 24 }
+const ENDPOINTS = {
+    POSTS: ApiEndpoint.endpoint("http://jsonplaceholder.typicode.com/posts"),
+    USERS: ApiEndpoint.endpoint("http://jsonplaceholder.typicode.com/users")
 };
     
 export class Example {
@@ -23,7 +23,7 @@ export class Example {
         this.api.get([ENDPOINTS.POSTS, ENDPOINTS.USERS]).then(response => {
             
             // access data via your endpoint
-            console.log(response[ENDPOINTS.USERS.endpoint]);
+            console.log(ENDPOINTS.POSTS.unwrap(response));
         });
     }
 }
@@ -32,44 +32,18 @@ export class Example {
 ## Documentation
 
 ### Configuration
-You can define a base url and an api key, that will be used for all requests, or you define your endpoints with the whole domain.
-
-`url`, `endpoint`, `api key` and `params` will be concatenated like so, to see which url is requested, you can enable debug mode by using `enableDebug()`.
-````typescript
-const request_url = url + endpoint + api_key + params;
-````
-
-#### With Base Url and Api key
+You can define your request with an url. The url can be extended later on, when you want to modify one endpoint in different ways.
 
 ```typescript
-export const API_CONFIG = {
-    url: "[BASE URL]",
-    api_key: "[API KEY]"
+const ENDPOINTS = {
+    POSTS: ApiEndpoint.endpoint("http://jsonplaceholder.typicode.com/posts")
 };
 ```
 
-`lifetime` describes the cache time in hours. Use `0` or disable cache to do not use cache.
+`lifetime` describes the cache time in hours. Use `0` or disable cache to do not use cache, 24 hours is default value. You can set it like here:
 
-```typescript
-export const API = {
-    POSTS: { endpoint: "/posts", lifetime: 1 }
-};
 ```
-
-#### Without Base Url and Api key
-When you want to use multiple api's, you can put the whole domain including the endpoint, into the endpoint.
-
-```typescript
-export const API_CONFIG = {
-    url: "",
-    api_key: ""
-};
-```
-
-```typescript
-export const API = {
-    POSTS: { endpoint: "[URL and ENDPOINT]", lifetime: 1 }
-};
+ENDPOINTS.POSTS.setLifetime(48);
 ```
 
 ### Methods
@@ -100,12 +74,12 @@ Requests that do not need each other can be fetched asynchronously.
 // start multiple api requests
 this.api.get(ENDPOINTS.POSTS).then(response => {
     // access data
-    console.log(response[ENDPOINTS.POSTS.endpoint]);
+    console.log(ENDPOINTS.POSTS.unwrap(response));
 });
 
 this.api.get(ENDPOINTS.USERS).then(response => {
     // access data
-    console.log(response[ENDPOINTS.USERS.endpoint]);
+    console.log(ENDPOINTS.USERS.unwrap(response));
 });
 ```
 
@@ -116,7 +90,7 @@ When you need both requests at the same time, you can use the synchronous fetche
 // start one request with multiple endpoints
 this.api.get([ENDPOINTS.POSTS, ENDPOINTS.USERS]).then(response => {
     // access data
-    console.log(response[ENDPOINTS.POSTS.endpoint]);
-    console.log(response[ENDPOINTS.USERS.endpoint]);
+    console.log(ENDPOINTS.POSTS.unwrap(response));
+    console.log(ENDPOINTS.USERS.unwrap(response));
 });
 ```
