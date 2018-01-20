@@ -34,11 +34,12 @@ export class ApiEndpoint {
 
     /**
      *
-     * @param {string[]} data
+     * @param {object} data
+     * @param {string} opt
      * @returns {string}
      */
-    public unwrap (data: object) : string {
-        return data[this.url];
+    public unwrap (data: object, opt: string = "") : string {
+        return data[this.url + opt];
     }
 
     /**

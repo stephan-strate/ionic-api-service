@@ -19,6 +19,9 @@ export const API = {
 })
 export class AboutPage {
 
+    public posts: string;
+    public comments: string;
+
     public users: string;
 
     constructor(public navCtrl: NavController, private api: ApiProvider) {
@@ -27,11 +30,18 @@ export class AboutPage {
 
     public ionViewDidLoad () {
         this.api.enableDebug();
-        this.api.get([API.COMMENTS, API.USERS], "?postId=1").then(data => {
+
+        this.api.get([API.POSTS, API.COMMENTS]).then(data => {
+            this.posts = API.POSTS.unwrap(data);
+            this.comments = API.COMMENTS.unwrap(data);
+        }).catch(error => {
+            console.error("Error.")
+        });
+
+        this.api.get(API.USERS).then(data => {
             this.users = API.USERS.unwrap(data);
         }).catch(error => {
             console.error("Error.");
-            console.log(error);
         });
     }
 }
