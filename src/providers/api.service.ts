@@ -11,13 +11,13 @@ import 'rxjs/add/operator/map';
 export const API_CONFIG = {
 	url: 'http://jsonplaceholder.typicode.com',
 	api_key: ''
-}
+};
 
 export const API = {
 	POSTS: { endpoint: '/posts', lifetime: 1 },
 	USERS: { endpoint: '/users', lifetime: 24 },
 	COMMENTS: { endpoint: '/comments', lifetime: 48 }
-}
+};
 
 @Injectable()
 export class ApiProvider {
@@ -453,22 +453,31 @@ export class ApiProvider {
 		});
 	}
 
-	/**
-	 * Function to hash a string. We need this to
-	 * store results of api requests.
-	 * @param raw {string}	string to hash
-	 * @return {number}	hash code of parameter raw
-	 */
-	private hash (raw: string) : string {
-		var hash = 0, i, chr, len;
-		if (raw.length === 0) return '' + hash;
-		for (i = 0, len = raw.length; i < len; i++) {
-			chr = raw.charCodeAt(i);
-			hash = ((hash << 5) - hash) + chr;
-			hash |= 0; // Convert to 32bit integer
+    /**
+	 * Generates a hash string out of a raw string
+     * input. It is used to store and access data
+     * from remote requests.
+     * @param {string} raw  raw string input to generate hash from
+     * @returns {string}    generated hash string
+     */
+	private static hash (raw: string) : string {
+		// declare variables
+		let hash = 0, char;
+
+		if (raw == null || raw.length == 0) {
+			// catch empty string
+			return hash.toString();
+		} else {
+			// generate hash for full string
+            for (let i = 0; i < raw.length; i++) {
+                char = raw.charCodeAt(i); // get current char
+                hash = ((hash << 5) - hash) + char; // extend hash value
+                hash = hash & hash; // Convert to 32bit integer
+            }
 		}
 
-		return '' + hash;
+		// parse hash number to string
+		return hash.toString();
 	}
 
 	/**
@@ -480,7 +489,7 @@ export class ApiProvider {
 	private cacheItems (result: string, url: string) : void {
 		// only use storage when cache is enabled
 		if (this.cache) {
-			this.storage.set(this.hash(url), { value: JSON.stringify(result), timestamp: new Date() });
+			this.storage.set(ApiProvider.hash(url), { value: JSON.stringify(result), timestamp: new Date() });
 		}
 	}
 
@@ -489,10 +498,10 @@ export class ApiProvider {
 	 * @param url {string}	url to request from storage
 	 * @return {Promise}	storage element of url
 	 */
-	private async getCache (url: string) {
+	private async getCache (url: string) : Promise<any> {
 		if (this.cache) {
 			// requesting storage when activated
-			return await this.storage.get(this.hash(url));
+			return await this.storage.get(ApiProvider.hash(url));
 		} else {
 			// returning null promise when cache is disabled
 			return await new Promise((resolve, reject) => {
