@@ -1,38 +1,145 @@
-import { Injectable } from '@angular/core';
-
-import { Http, Response } from '@angular/http';
-import { ToastController, Events } from 'ionic-angular';
-import { Storage } from '@ionic/storage';
+import { Injectable } from "@angular/core";
+import { Http, Response } from "@angular/http";
+import { ToastController, Events } from "ionic-angular";
+import { Storage } from "@ionic/storage";
 
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/operator/map';
+import "rxjs/add/observable/forkJoin";
+import "rxjs/add/operator/map";
 
-export const API_CONFIG = {
-	url: 'http://jsonplaceholder.typicode.com',
-	api_key: ''
-};
+/**
+ *
+ */
+export class ApiEndpoint {
 
-export const API = {
-	POSTS: { endpoint: '/posts', lifetime: 1 },
-	USERS: { endpoint: '/users', lifetime: 24 },
-	COMMENTS: { endpoint: '/comments', lifetime: 48 }
-};
+    /**
+     *
+     */
+	private url: string;
 
+    /**
+     *
+     */
+    private lifetime: number;
+
+    /**
+     *
+     * @param {string} url
+     * @param {number} lifetime
+     */
+    constructor (url: string, lifetime: number) {
+        this.url = url;
+        this.lifetime = lifetime;
+    }
+
+    /**
+     *
+     * @param {string[]} data
+     * @returns {string}
+     */
+    public unwrap (data: object) : string {
+        return data[this.url];
+    }
+
+    /**
+     *
+     * @returns {string}
+     */
+    public getUrl () : string {
+        return this.url;
+    }
+
+    /**
+     *
+     * @param {string} url
+     */
+    public setUrl (url: string) : void {
+        this.url = url;
+    }
+
+    /**
+     *
+     * @returns {number}
+     */
+    public getLifetime () : number {
+        return this.lifetime;
+    }
+
+    /**
+     *
+     * @param {number} lifetime
+     */
+    public setLifetime (lifetime: number) : void {
+        this.lifetime = lifetime;
+    }
+
+    /**
+     *
+     * @param {string} url
+     * @returns {ApiEndpoint}
+     */
+    public static endpoint (url: string) : ApiEndpoint {
+        return new ApiEndpoint(url, 24);
+    }
+}
+
+/**
+ *
+ */
 @Injectable()
 export class ApiProvider {
 
+    /**
+     *
+     */
 	private error: any;
+
+    /**
+     *
+     * @type {boolean}
+     */
 	private errorInstance: boolean = false;
 
-	private message: string = 'Bitte Internetverbindung überprüfen';
-	private button: string = 'Neu laden';
+    /**
+     *
+     * @type {string}
+     */
+	private message: string = "Check your internet connection.";
+
+    /**
+     *
+     * @type {string}
+     */
+	private button: string = "Reload";
+
+    /**
+     *
+     * @type {number}
+     */
 	private duration: number = 3000;
 
+    /**
+     *
+     * @type {number}
+     */
 	private repeat: number = 3;
+
+    /**
+     *
+     * @type {number}
+     */
 	private delay: number = 1000;
 
+    /**
+     *
+     * @type {boolean}
+     */
 	private cache: boolean = true;
+
+    /**
+     *
+     * @type {boolean}
+     */
 	private debug: boolean = false;
 
 	/**
@@ -42,10 +149,10 @@ export class ApiProvider {
 	 */
 	public enableDebug () : boolean {
 		 if (!this.debug) {
-			 console.info('Api Service: Debug mode enabled.');
+			 console.info("Api Service: Debug mode enabled.");
 			 return this.debug = true;
 		 } else {
-			 console.warn('Api Service: Debug mode can not be enabled multiple times.');
+			 console.warn("Api Service: Debug mode can not be enabled multiple times.");
 			 return false;
 		 }
 	}
@@ -94,9 +201,9 @@ export class ApiProvider {
 	public setMessage (message: string) : boolean {
 		if (this.debug) {
 			if (this.error) {
-				console.warn('Api Service: You can not change the toast, while its active.');
+				console.warn("Api Service: You can not change the toast, while its active.");
 			} else {
-				console.info('Api Service: Custom error message set.');
+				console.info("Api Service: Custom error message set.");
 			}
 		}
 
@@ -125,9 +232,9 @@ export class ApiProvider {
 	public setButton (button: string) : boolean {
 		if (this.debug) {
 			if (this.error) {
-				console.warn('Api Service: You can not change the toast, while its active.');
+				console.warn("Api Service: You can not change the toast, while its active.");
 			} else {
-				console.info('Api Service: Custom button text set.');
+				console.info("Api Service: Custom button text set.");
 			}
 		}
 
@@ -156,9 +263,9 @@ export class ApiProvider {
 	public setDuration (duration: number) : boolean {
 		if (this.debug) {
 			if (this.error) {
-				console.warn('Api Service: You can not change the toast, while its active.');
+				console.warn("Api Service: You can not change the toast, while its active.");
 			} else {
-				console.info('Api Service: Custom duration set.');
+				console.info("Api Service: Custom duration set.");
 			}
 		}
 
@@ -186,7 +293,7 @@ export class ApiProvider {
 	 */
 	public setRepeat (repeat: number) : boolean {
 		if (this.debug) {
-			console.info('Api Service: Custom repeat set.');
+			console.info("Api Service: Custom repeat set.");
 		}
 
 		this.repeat = repeat;
@@ -209,7 +316,7 @@ export class ApiProvider {
 	 */
 	public setDelay (delay: number) : boolean {
 		if (this.debug) {
-			console.info('Api Service: Custom delay set.');
+			console.info("Api Service: Custom delay set.");
 		}
 
 		this.delay = delay;
@@ -224,9 +331,9 @@ export class ApiProvider {
 		return this.delay;
 	}
 
-	constructor(private http: Http, private storage: Storage, private toastCtrl: ToastController, private events: Events) {
+	constructor (private http: Http, private storage: Storage, private toastCtrl: ToastController, private events: Events) {
 		if (this.debug) {
-			console.debug('ApiService initialized.');
+			console.debug("ApiService initialized.");
 		}
 	}
 
@@ -236,28 +343,28 @@ export class ApiProvider {
 	 * @param opt {string | string[]}		optional parameters to endpoints 
 	 * @return {Promise<object>}	Object that includes all results or error
 	 */
-	public get (api: { endpoint: string, lifetime: number } | { endpoint: string, lifetime: number }[], opt?: string | string[]) : Promise<object> {
+	public get (api: ApiEndpoint | ApiEndpoint[], opt?: string | string[]) : Promise<object> {
 		// mapping all parameters to a readable format
-		var requests;
-		var opts;
+		let requests;
+		let opts;
 
-		if (!this.isArray(api)) {
+		if (!ApiProvider.isArray(api)) {
 			if (this.debug) {
-				console.info('Api Service: Single request initialized.');
+				console.info("Api Service: Single request initialized.");
 			}
 
 			// building array of api request
 			requests = [].concat(api);
 		} else {
 			if (this.debug) {
-				console.info('Api Service: Multiple request initialized.');
+				console.info("Api Service: Multiple request initialized.");
 			}
 
 			requests = api;
 		}
 
 		// mapping parameters to array
-		if (!this.isArray(opt)) {
+		if (!ApiProvider.isArray(opt)) {
 			opts = [].concat(opt);
 		} else {
 			opts = opt;
@@ -267,10 +374,10 @@ export class ApiProvider {
 			// start all api requests
 			this.multiplePromise(requests, opts).subscribe(result => {
 				// map result for return
-				var values = new Array();
-				for (var i = 0; i < requests.length; i++) {
-					var temp = opts[i] ? opts[i] : '';
-					values[requests[i].endpoint + temp] = result[i];
+				let values = [];
+				for (let i = 0; i < requests.length; i++) {
+					let temp = opts[i] ? opts[i] : '';
+					values[requests[i].getUrl() + temp] = result[i];
 				}
 
 				resolve(values);
@@ -286,7 +393,7 @@ export class ApiProvider {
 	 * @param test {any | any[]}	array or object to test
 	 * @return {boolean}	whether the object is an array or not
 	 */
-	private isArray (test: any | any[]) : boolean {
+	private static isArray (test: any | any[]) : boolean {
 		// most common strategy to check if it's an array or not
 		return Object.prototype.toString.call(test) === '[object Array]';
 	}
@@ -297,16 +404,16 @@ export class ApiProvider {
 	 * @param opt {string | string[]}	optional parameters to endpoints
 	 * @return {Observable<string[]>}	all requests together
 	 */
-	private multiplePromise (requests: { endpoint: string, lifetime: number }[], opt: string | string[] = []) : Observable<string[]> {
-		var result: Promise<string>[] = new Array();
+	private multiplePromise (requests: ApiEndpoint[], opt: string | string[] = []) : Observable<string[]> {
+		let result: Promise<string>[] = [];
 
 		// creating array of all requests
-		for (var i = 0; i < requests.length; i++) {
-			result.push(this.request(this.concatUrl(requests[i], opt[i]), requests[i].lifetime));
+		for (let i = 0; i < requests.length; i++) {
+			result.push(this.request(this.concatUrl(requests[i], opt[i]), requests[i].getLifetime()));
 		}
 
 		if (this.debug) {
-			console.info('Api Service: Forked ' + requests.length + ' requests together. Waiting for result.');
+			console.info("Api Service: Forked " + requests.length + " requests together. Waiting for result.");
 		}
 
 		// fork all requests together and make them subscribable
@@ -320,12 +427,12 @@ export class ApiProvider {
 	 * @param opt {string}	optional parameter to endpoint
 	 * @return {string}		request ready url
 	 */
-	private concatUrl (api: { endpoint: string, lifetime: number }, opt: string = '') : string {
+	private concatUrl (api: ApiEndpoint, opt: string = "") : string {
 		if (this.debug) {
-			console.info('Api Service: Called url ' + API_CONFIG.url + api.endpoint + API_CONFIG.api_key + opt);
+			console.info("Api Service: Called url " + api.getUrl() + opt);
 		}
 
-		return API_CONFIG.url + api.endpoint + API_CONFIG.api_key + opt;
+		return api.getUrl() + opt;
 	}
 
 	/**
@@ -339,18 +446,18 @@ export class ApiProvider {
 	private request (url: string, lifetime: number, number: number = 0) : Promise<string> {
 		return new Promise((resolve, reject) => {
 			if (this.debug) {
-				console.info('Api Service: Starting request ' + url + '.');
+				console.info("Api Service: Starting request " + url + ".");
 			}
 
 			this.getCache(url).then(value => {
 				if (value == null || (new Date().getTime() - new Date(value.timestamp).getTime()) > (lifetime * 3600000)) {
 					if (this.debug) {
-						console.info('Api Service: No cached values for ' +  url + ' found.');
+						console.info("Api Service: No cached values for " +  url + " found.");
 					}
 
-					this.http.get(url).map(this.extract).subscribe(result => {
+					this.http.get(url).map(ApiProvider.extract).subscribe(result => {
 						if (this.debug) {
-							console.info('Api Service: Request ' + url + ' successful.');
+							console.info("Api Service: Request " + url + " successful.");
 						}
 		
 						// case 1: normal request
@@ -359,7 +466,7 @@ export class ApiProvider {
 					}, error => {
 						// case 2: problems with request
 						if (this.debug) {
-							console.warn('Api Service: Request ' + url + ' failed.');
+							console.warn("Api Service: Request " + url + " failed.");
 						}
 		
 						if (number < (this.repeat - 1)) {
@@ -380,7 +487,7 @@ export class ApiProvider {
 								this.error = this.errorMessage();
 		
 								this.error.onDidDismiss((data, role) => {
-									this.events.publish('error:dismiss', data, role);
+									this.events.publish("error:dismiss", data, role);
 			
 									// deleting error message again
 									this.errorInstance = false;
@@ -389,8 +496,8 @@ export class ApiProvider {
 								this.error.present();
 							}
 		
-							this.events.subscribe('error:dismiss', (data, role) => {
-								if (role == 'close') {
+							this.events.subscribe("error:dismiss", (data, role) => {
+								if (role == "close") {
 									this.request(url, lifetime).then(result => {
 										this.cacheItems(result, url);
 										resolve(result);
@@ -401,13 +508,13 @@ export class ApiProvider {
 									reject(error);
 								}
 		
-								this.events.unsubscribe('error:dismiss');
+								this.events.unsubscribe("error:dismiss");
 							});
 						}
 					});
 				} else {
 					if (this.debug) {
-						console.info('Api Service: Cached values for ' + url + ' found.');
+						console.info("Api Service: Cached values for " + url + " found.");
 					}
 
 					try {
@@ -428,7 +535,7 @@ export class ApiProvider {
 	 * @param res
 	 * @return {string}	result, whether json or source
 	 */
-	private extract (res: Response) : string {
+	private static extract (res: Response) : string {
 		try {
 			// trying to map result to json
 			return res.json();
@@ -446,7 +553,7 @@ export class ApiProvider {
 		return this.toastCtrl.create({
 			message: this.message,
 			duration: this.duration,
-			position: 'bottom',
+			position: "bottom",
 			showCloseButton: true,
 			closeButtonText: this.button,
 			dismissOnPageChange: true
@@ -472,7 +579,7 @@ export class ApiProvider {
             for (let i = 0; i < raw.length; i++) {
                 char = raw.charCodeAt(i); // get current char
                 hash = ((hash << 5) - hash) + char; // extend hash value
-                hash = hash & hash; // Convert to 32bit integer
+                hash = hash & hash; // convert to 32bit integer
             }
 		}
 
