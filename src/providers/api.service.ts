@@ -8,6 +8,41 @@ import "rxjs/add/observable/forkJoin";
 import "rxjs/add/operator/map";
 
 /**
+ * Set of api request modes, that have a slightly
+ * different behaviour. They are optional for every
+ * ApiProvider request. Default mode is DIRECT.
+ */
+export enum ApiMode {
+    /**
+     * Default Mode. Requests that fail and are
+     * still cached will be fetched from cache.
+     * Successful requests will be shipped. Error
+     * message will be shown, when request fails.
+     */
+    DIRECT,
+
+    /**
+     * Requests that are cached will be shipped
+     * instantly. When data is out of lifetime, new data will
+     * be fetched from endpoint and stored in cached.
+     * When request fails, no error message will be shown.
+     * When no data is cached for this request,
+     * a default DIRECT request will be executed.
+     */
+    BACKGROUND,
+
+    /**
+     * Requests that are cached will be shipped
+     * instantly. When data is out of lifetime, new data will
+     * be fetched from endpoint and shipped too.
+     * When request fails, no error message will be shown.
+     * When no data is cached for this request,
+     * a default DIRECT request will be executed.
+     */
+    FAST
+}
+
+/**
  *
  */
 export class ApiEndpoint {
@@ -48,14 +83,6 @@ export class ApiEndpoint {
      */
     public getUrl () : string {
         return this.url;
-    }
-
-    /**
-     *
-     * @param {string} url
-     */
-    public setUrl (url: string) : void {
-        this.url = url;
     }
 
     /**
@@ -338,13 +365,14 @@ export class ApiProvider {
 		}
 	}
 
-	/**
-	 * 
-	 * @param api {object | object Array}	api objects @see API
-	 * @param opt {string | string[]}		optional parameters to endpoints 
-	 * @return {Promise<object>}	Object that includes all results or error
-	 */
-	public get (api: ApiEndpoint | ApiEndpoint[], opt?: string | string[]) : Promise<object> {
+    /**
+     *
+     * @param {ApiEndpoint | ApiEndpoint[]} api
+     * @param {string | string[]} opt
+     * @param {ApiMode} mode
+     * @returns {Promise<object>}
+     */
+	public get (api: ApiEndpoint | ApiEndpoint[], opt?: string | string[], mode?: ApiMode) : Promise<object> {
 		// mapping all parameters to a readable format
 		let requests;
 		let opts;
