@@ -1,7 +1,7 @@
 // general imports
 import { Injectable } from "@angular/core";
 import { Http, Response } from "@angular/http";
-import {ToastController, Events, Toast} from "ionic-angular";
+import { ToastController, Events, Toast } from "ionic-angular";
 import { Storage } from "@ionic/storage";
 
 // rxjs imports
@@ -15,6 +15,7 @@ import "rxjs/add/operator/map";
  * ApiProvider request. Default mode is DIRECT.
  */
 export enum ApiMode {
+
     /**
      * Default Mode. Requests that fail and are
      * still cached will be fetched from cache.
@@ -42,6 +43,55 @@ export enum ApiMode {
      * a default DIRECT request will be executed.
      */
     FAST
+}
+
+/**
+ *
+ */
+export enum ApiType {
+
+    /**
+     *
+     */
+    LIVE,
+
+    /**
+     *
+     */
+    CACHE
+}
+
+/**
+ *
+ */
+export class ApiResult {
+
+    /**
+     *
+     */
+    private response: string;
+
+    /**
+     *
+     */
+    private type: ApiType;
+
+    /**
+     *
+     */
+    private date: Date;
+
+    /**
+     *
+     */
+    private update: Promise<object>;
+
+    /**
+     *
+     */
+    constructor () {
+
+    }
 }
 
 /**
@@ -106,10 +156,12 @@ export class ApiEndpoint {
     /**
      *
      * @param {string} url
+     * @param {number} lifetime
      * @returns {ApiEndpoint}
      */
-    public static endpoint (url: string) : ApiEndpoint {
-        return new ApiEndpoint(url, 24);
+    public static endpoint (url: string, lifetime?: number) : ApiEndpoint {
+        if (!lifetime) lifetime = 24;
+        return new ApiEndpoint(url, lifetime);
     }
 }
 
