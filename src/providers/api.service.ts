@@ -1,8 +1,10 @@
+// general imports
 import { Injectable } from "@angular/core";
 import { Http, Response } from "@angular/http";
-import { ToastController, Events } from "ionic-angular";
+import {ToastController, Events, Toast} from "ionic-angular";
 import { Storage } from "@ionic/storage";
 
+// rxjs imports
 import { Observable } from 'rxjs/Observable';
 import "rxjs/add/observable/forkJoin";
 import "rxjs/add/operator/map";
@@ -419,7 +421,7 @@ export class ApiProvider {
 
 	/**
 	 * You can test an object if it is an array or not.
-	 * @param test {any | any[]}	array or object to test
+	 * @param test {object | object[]}	array or object to test
 	 * @return {boolean}	whether the object is an array or not
 	 */
 	private static isArray (test: any | any[]) : boolean {
@@ -429,7 +431,7 @@ export class ApiProvider {
 
 	/**
 	 * Forking all requests together and make them subscribable.
-	 * @param requests {object Array}	api objects @see API
+	 * @param requests {ApiEndpoint[]}	api objects @see API
 	 * @param opt {string | string[]}	optional parameters to endpoints
 	 * @return {Observable<string[]>}	all requests together
 	 */
@@ -574,11 +576,11 @@ export class ApiProvider {
 		}
 	}
 
-	/**
-	 * Returning the controller for error message
-	 * @return {any}	error message toast controller
-	 */
-	private errorMessage () : any {
+    /**
+     * Returning the controller for error message
+     * @returns {Toast} error message toast controller
+     */
+	private errorMessage () : Toast {
 		return this.toastCtrl.create({
 			message: this.message,
 			duration: this.duration,
@@ -622,10 +624,10 @@ export class ApiProvider {
 	 * @param url {string}		url to cache to
 	 * @return none
 	 */
-	private cacheItems (result: string, url: string) : void {
+	private cacheItems (result: string, url: string) : Promise<any> {
 		// only use storage when cache is enabled
 		if (this.cache) {
-			this.storage.set(ApiProvider.hash(url), { value: JSON.stringify(result), timestamp: new Date() });
+			return this.storage.set(ApiProvider.hash(url), { value: JSON.stringify(result), timestamp: new Date() });
 		}
 	}
 
@@ -640,7 +642,7 @@ export class ApiProvider {
 			return await this.storage.get(ApiProvider.hash(url));
 		} else {
 			// returning null promise when cache is disabled
-			return await new Promise((resolve, reject) => {
+			return await new Promise((resolve) => {
 				resolve(null);
 			});
 		}
