@@ -21,7 +21,7 @@ import { ToastController, Events, Toast } from "ionic-angular";
 import { Storage } from "@ionic/storage";
 
 // rxjs imports
-import { Observable } from 'rxjs/Observable';
+import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/forkJoin";
 import "rxjs/add/operator/map";
 

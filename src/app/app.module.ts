@@ -7,6 +7,9 @@ import { MyApp } from './app.component';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
+import { ApiProvider } from "../providers/api.service";
+import { IonicStorageModule } from "@ionic/storage";
+
 @NgModule({
     declarations: [
       	MyApp
@@ -14,6 +17,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     imports: [
 		BrowserModule,
 		HttpModule,
+        IonicStorageModule.forRoot(),
       	IonicModule.forRoot(MyApp)
     ],
     bootstrap: [IonicApp],
@@ -23,7 +27,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     providers: [
       	StatusBar,
       	SplashScreen,
-		{provide: ErrorHandler, useClass: IonicErrorHandler}
+		{provide: ErrorHandler, useClass: IonicErrorHandler},
+        ApiProvider
     ]
 })
 
