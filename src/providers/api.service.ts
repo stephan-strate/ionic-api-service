@@ -17,7 +17,7 @@
 // general imports
 import { Injectable } from "@angular/core";
 import { Http, Response } from "@angular/http";
-import {ToastController, Events, Toast, List} from "ionic-angular";
+import { ToastController, Events, Toast } from "ionic-angular";
 import { Storage } from "@ionic/storage";
 
 // rxjs imports
@@ -62,24 +62,100 @@ export enum ApiMode {
 }
 
 /**
- *
+ * ApiType describes an ApiObject origin.
+ * When the ApiObject was fetched from cache it
+ * has type CACHE, when it is fetched from remote
+ * service, it is LIVE.
  */
 export enum ApiType {
 
     /**
-     *
+     * When an ApiObject was fetched from
+     * remote service.
      */
     LIVE,
 
     /**
-     *
+     * When an ApiObject was fetched from
+     * cache.
      */
     CACHE
 }
 
+/**
+ * More or less the result of an api request.
+ * It describes the result, from where and when it was
+ * fetched, and of course the response itself.
+ */
 export class ApiObject {
 
+    /**
+     * Raw response from cache/remote service.
+     * More or less the pure result from request.
+     */
     private response: string;
+
+    /**
+     * Describes from where the content was fetched.
+     * Whether from LIVE or from CACHE.
+     */
+    private type: ApiType;
+
+    /**
+     * Shows when the content was fetched from the
+     * remote service.
+     */
+    private date: Date;
+
+    /**
+     * Constructor.
+     * @param {string} response     raw response from cache/remote service
+     * @param {ApiType} type        from where was response fetched
+     * @param {Date} date           when was it fetched from remote service
+     */
+    constructor (response: string, type: ApiType, date: Date) {
+        this.response = response;
+        this.type = type;
+        this.date = date;
+    }
+
+    /**
+     * Returns the raw response. Might be decoded
+     * to json already.
+     * @returns {string}    json decoded response
+     */
+    public unwrap () : string {
+        return this.response;
+    }
+
+    /**
+     * Returns the type, from where content was fetched.
+     * @returns {ApiType}   from where was response fetched
+     */
+    public getType () : ApiType {
+        return this.type;
+    }
+
+    /**
+     * Returns the date, when the data was fetched from
+     * remote service.
+     * @returns {Date}  when was it fetched from remote service
+     */
+    public getDate () : Date {
+        return this.date;
+    }
+
+    /**
+     * Creating a new ApiObject. Possibility to create the object
+     * with the current date or with a defined date.
+     * @param {string} response     raw response from cache/remote service
+     * @param {ApiType} type        from where was response fetched
+     * @param {Date} date           when was it fetched from remote service
+     * @returns {ApiObject}         object that contains all data from a request
+     */
+    public static create (response: string, type: ApiType, date: Date = new Date()) : ApiObject {
+        return new ApiObject(response, type, date);
+    }
 }
 
 /**
@@ -95,11 +171,6 @@ export class ApiResult {
     /**
      *
      */
-    private type: ApiType;
-
-    /**
-     *
-     */
     private date: Date;
 
     /**
@@ -109,13 +180,11 @@ export class ApiResult {
 
     /**
      *
-     * @param {string} response
-     * @param {ApiType} type
-     * @param {Promise<object>} update
+     * @param {Map<ApiEndpoint, ApiObject>} response
+     * @param {Promise<ApiResult>} update
      */
-    constructor (response: Map<ApiEndpoint, ApiObject>, type: ApiType, update: Promise<object>) {
+    constructor (response: Map<ApiEndpoint, ApiObject>, update: Promise<ApiResult>) {
         this.response = response;
-        this.type = type;
         this.update = update;
         this.date = new Date();
     }
@@ -123,34 +192,33 @@ export class ApiResult {
     /**
      *
      * @param {ApiEndpoint} key
-     * @returns {ApiObject}
+     * @returns {string}
      */
-    public get (key: ApiEndpoint) : ApiObject {
-        return this.response.get(key);
+    public unwrap (key: ApiEndpoint) : string {
+        return this.response.get(key).unwrap();
     }
 
     /**
      *
-     * @returns {Promise<any>}
+     * @returns {Promise<ApiResult>}
      */
-    public getUpdate () : Promise<any> {
+    public getUpdate () : Promise<ApiResult> {
         if (this.update != null) {
             return this.update;
         }
 
-        throw new ReferenceError("The use of 'getUpdate()' is not allowed with ApiType " + this.type + ". The ApiType FAST provides an update object, for example.");
+        throw new ReferenceError("The use of 'getUpdate()' is not allowed with the current ApiMode. The ApiMode FAST provides an update object, for example.");
     }
 
     /**
      *
-     * @param {string} response
-     * @param {ApiType} type
-     * @param {Promise<object>} update
+     * @param {Map<ApiEndpoint, ApiObject>} response
+     * @param {Promise<ApiResult>} update
      * @returns {ApiResult}
      */
-    public static create (response: string, type: ApiType, update?: Promise<object>) : ApiResult {
+    public static create (response: Map<ApiEndpoint, ApiObject>, update?: Promise<ApiResult>) : ApiResult {
         if (!update) update = null;
-        return new ApiResult(response, type, update);
+        return new ApiResult(response, update);
     }
 }
 
@@ -177,22 +245,20 @@ export class ApiEndpoint {
 
     /**
      *
-     * @param {string} url
+     * @param {string} base
      * @param {number} lifetime
      */
-    constructor (url: string, lifetime: number) {
-        this.url = url;
+    constructor (base: string, lifetime: number) {
+        this.base = base;
         this.lifetime = lifetime;
     }
 
     /**
      *
-     * @param {object} data
      * @param {string} opt
-     * @returns {string}
      */
-    public unwrap (data: object, opt: string = "") : string {
-        return data[this.url + opt];
+    public modify (opt: string) : void {
+        this.opt = opt;
     }
 
     /**
@@ -200,7 +266,15 @@ export class ApiEndpoint {
      * @returns {string}
      */
     public getUrl () : string {
-        return this.url;
+        return this.base + this.opt;
+    }
+
+    /**
+     *
+     * @returns {string}
+     */
+    public getBase () : string {
+        return this.base;
     }
 
     /**
@@ -221,13 +295,13 @@ export class ApiEndpoint {
 
     /**
      *
-     * @param {string} url
+     * @param {string} base
      * @param {number} lifetime
      * @returns {ApiEndpoint}
      */
-    public static endpoint (url: string, lifetime?: number) : ApiEndpoint {
+    public static endpoint (base: string, lifetime?: number) : ApiEndpoint {
         if (!lifetime) lifetime = 24;
-        return new ApiEndpoint(url, lifetime);
+        return new ApiEndpoint(base, lifetime);
     }
 }
 
