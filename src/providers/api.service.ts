@@ -17,7 +17,7 @@
 // general imports
 import { Injectable } from "@angular/core";
 import { Http, Response } from "@angular/http";
-import { ToastController, Events, Toast } from "ionic-angular";
+import {ToastController, Events, Toast, List} from "ionic-angular";
 import { Storage } from "@ionic/storage";
 
 // rxjs imports
@@ -77,6 +77,11 @@ export enum ApiType {
     CACHE
 }
 
+export class ApiObject {
+
+    private response: string;
+}
+
 /**
  *
  */
@@ -85,7 +90,7 @@ export class ApiResult {
     /**
      *
      */
-    private response: string;
+    private response: Map<ApiEndpoint, ApiObject>;
 
     /**
      *
@@ -104,9 +109,48 @@ export class ApiResult {
 
     /**
      *
+     * @param {string} response
+     * @param {ApiType} type
+     * @param {Promise<object>} update
      */
-    constructor () {
+    constructor (response: Map<ApiEndpoint, ApiObject>, type: ApiType, update: Promise<object>) {
+        this.response = response;
+        this.type = type;
+        this.update = update;
+        this.date = new Date();
+    }
 
+    /**
+     *
+     * @param {ApiEndpoint} key
+     * @returns {ApiObject}
+     */
+    public get (key: ApiEndpoint) : ApiObject {
+        return this.response.get(key);
+    }
+
+    /**
+     *
+     * @returns {Promise<any>}
+     */
+    public getUpdate () : Promise<any> {
+        if (this.update != null) {
+            return this.update;
+        }
+
+        throw new ReferenceError("The use of 'getUpdate()' is not allowed with ApiType " + this.type + ". The ApiType FAST provides an update object, for example.");
+    }
+
+    /**
+     *
+     * @param {string} response
+     * @param {ApiType} type
+     * @param {Promise<object>} update
+     * @returns {ApiResult}
+     */
+    public static create (response: string, type: ApiType, update?: Promise<object>) : ApiResult {
+        if (!update) update = null;
+        return new ApiResult(response, type, update);
     }
 }
 
@@ -118,7 +162,13 @@ export class ApiEndpoint {
     /**
      *
      */
-	private url: string;
+    private base: string;
+
+    /**
+     *
+     * @type {string}
+     */
+	private opt: string = "";
 
     /**
      *
