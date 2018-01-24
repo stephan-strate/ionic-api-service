@@ -312,6 +312,12 @@ export class ApiEndpoint {
 export class ApiProvider {
 
     /**
+	 *
+     * @type {ModifiedObject}
+     */
+	public endpoints: ModifiedObject = {};
+
+    /**
      *
      */
 	private error: any;
@@ -839,4 +845,15 @@ export class ApiProvider {
 			});
 		}
 	}
+}
+
+/**
+ *
+ */
+interface ModifiedObject {
+
+    /**
+	 *
+     */
+	[key: string]: any;
 }

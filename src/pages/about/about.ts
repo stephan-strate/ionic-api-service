@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { NavController, IonicPage } from "ionic-angular";
 
-import { ApiProvider, Endpoints } from "../../providers/api.service";
+import { ApiProvider } from "../../providers/api.service";
 
 @IonicPage({
     name: "AboutPage"
@@ -23,14 +23,15 @@ export class AboutPage {
     }
 
     public ionViewDidLoad () {
-        this.api.get([Endpoints.POSTS, Endpoints.COMMENTS]).then(data => {
-
+        this.api.get([this.api.endpoints.POSTS, this.api.endpoints.COMMENTS]).then(data => {
+            this.posts = data[this.api.endpoints.POSTS.getUrl()];
+            this.comments = data[this.api.endpoints.COMMENTS.getUrl()];
         }).catch(error => {
             console.error("Error.")
         });
 
-        this.api.get(Endpoints.USERS).then(data => {
-
+        this.api.get(this.api.endpoints.USERS).then(data => {
+            this.users = data[this.api.endpoints.USERS.getUrl()];
         }).catch(error => {
             console.error("Error.");
         });
