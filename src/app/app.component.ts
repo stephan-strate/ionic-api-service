@@ -10,9 +10,9 @@ import { ApiEndpoint, ApiProvider } from "../providers/api.service";
   	templateUrl: "app.html"
 })
 
-export class MyApp {
+export class Demo {
 
-    public rootPage: any = "TabsPage";
+    protected rootPage: any = "TabsPage";
 
     constructor (public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen, public api: ApiProvider) {
       	platform.ready().then(() => {

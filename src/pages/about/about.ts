@@ -11,14 +11,15 @@ import { ApiProvider } from "../../providers/api.service";
     selector: "page-about",
     templateUrl: "about.html"
 })
+
 export class AboutPage {
 
-    public posts: string;
-    public comments: string;
+    protected posts: string;
+    protected comments: string;
 
-    public users: string;
+    protected users: string;
 
-    constructor(public navCtrl: NavController, private api: ApiProvider) {
+    constructor (public navCtrl: NavController, private api: ApiProvider) {
 
     }
 

@@ -1,6 +1,6 @@
-import { NgModule } from '@angular/core';
-import { IonicPageModule } from 'ionic-angular';
-import { ContactPage } from './contact';
+import { NgModule } from "@angular/core";
+import { IonicPageModule } from "ionic-angular";
+import { ContactPage } from "./contact";
  
 @NgModule({
     declarations: [
