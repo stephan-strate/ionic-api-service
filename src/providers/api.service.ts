@@ -176,7 +176,7 @@ export class ApiResult {
     /**
      *
      */
-    private update: Promise<object>;
+    private update: Promise<ApiResult>;
 
     /**
      *
