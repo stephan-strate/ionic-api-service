@@ -1,3 +1,8 @@
+## Not maintained at the moment
+
+**2018-04-14** -  Project currently not maintained.
+Due the changes of the Angular HttpClient, some of the functions I used will be deprecated.
+
 # RESTful API Provider for Ionic 3.x
 
 When I was first using Ionic, I spent a lot of time and nerves figuring out how to properly load data from a RESTful API. I build this Ionic 3.x provider to easily load data, cache it, reload it and show error messages, when data could not be loaded.
